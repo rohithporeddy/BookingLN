@@ -1,79 +1,137 @@
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import TestTubes from '../components/TestTubes'
+import { supabase } from '../lib/supabase'
+import Navbar from '../components/Navbar'
+
+function StatCard({ label, value, sub, accent }) {
+  return (
+    <div style={{
+      background: '#0f1120', border: '1px solid #1e2236',
+      borderRadius: '20px', padding: '28px 24px',
+      display: 'flex', flexDirection: 'column', gap: '8px',
+    }}>
+      <p style={{ color: '#4b5563', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '1.2px', margin: 0 }}>
+        {label}
+      </p>
+      <p style={{ color: accent || '#ffffff', fontSize: '36px', fontWeight: '900', margin: 0, letterSpacing: '-1px', lineHeight: 1 }}>
+        {value}
+      </p>
+      <p style={{ color: '#374151', fontSize: '12px', margin: 0 }}>{sub}</p>
+    </div>
+  )
+}
 
 export default function Home() {
   const navigate = useNavigate()
-  const user = JSON.parse(localStorage.getItem('user') || '{}')
+  const [orders, setOrders] = useState([])
+  const [loading, setLoading] = useState(true)
 
-  function handleLogout() {
-    localStorage.removeItem('user')
-    navigate('/')
+  const user = JSON.parse(localStorage.getItem('user') || 'null')
+  if (!user) {
+    navigate('/login', { replace: true })
+    return null
   }
 
-  const isAdmin = user.role === 'admin'
+  useEffect(() => { fetchOrders() }, [])
+
+  async function fetchOrders() {
+    setLoading(true)
+    const { data } = await supabase
+      .from('orders')
+      .select('total_amount, status')
+      .eq('phone', user.phone)
+    setOrders(data || [])
+    setLoading(false)
+  }
+
+  const total      = orders.length
+  const pending    = orders.filter(o => o.status === 'placed' || o.status === 'confirmed').length
+  const delivered  = orders.filter(o => o.status === 'delivered').length
+  const totalSpent = orders.reduce((sum, o) => sum + parseFloat(o.total_amount || 0), 0)
+
+  const stats = [
+    { label: 'Total Orders',       value: loading ? '…' : total,                          sub: 'All time',              accent: '#ffffff'  },
+    { label: 'Pending',            value: loading ? '…' : pending,                        sub: 'Placed or confirmed',   accent: '#60a5fa'  },
+    { label: 'Delivered',          value: loading ? '…' : delivered,                      sub: 'Successfully delivered', accent: '#4ade80' },
+    { label: 'Total Spent',        value: loading ? '…' : `₹${totalSpent.toFixed(0)}`,   sub: 'Across all orders',     accent: '#a78bfa'  },
+  ]
 
   return (
-    <div style={{ minHeight: '100vh', background: '#080a14', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 16px' }}>
-      <div style={{ width: '100%', maxWidth: '360px' }}>
+    <div style={{ minHeight: '100vh', background: '#080a14' }}>
+      <Navbar />
 
-        <TestTubes size={110} />
+      <main style={{ maxWidth: '900px', margin: '0 auto', padding: '48px 24px' }}>
 
-        {/* Welcome card */}
+        {/* Heading */}
+        <h1 style={{ color: '#ffffff', fontSize: '32px', fontWeight: '900', letterSpacing: '-0.5px', margin: '0 0 6px' }}>
+          Welcome back{user.name ? `, ${user.name}` : user.phone ? `, +91 ${user.phone}` : ''}
+        </h1>
+        <p style={{ color: '#4b5563', fontSize: '14px', margin: '0 0 40px' }}>
+          Here's your account at a glance.
+        </p>
+
+        {/* Role badge */}
+        <div style={{ marginBottom: '32px' }}>
+          <span style={{
+            background: 'rgba(59,130,246,0.15)', border: '1px solid rgba(59,130,246,0.3)',
+            color: '#60a5fa', fontSize: '11px', fontWeight: '600',
+            textTransform: 'uppercase', letterSpacing: '1px',
+            padding: '5px 12px', borderRadius: '999px',
+          }}>
+            {user.role}
+          </span>
+        </div>
+
+        {/* Analytics grid */}
         <div style={{
-          background: '#0f1120',
-          border: '1px solid #1e2236',
-          borderRadius: '20px',
-          padding: '28px 24px',
-          marginBottom: '20px',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+          gap: '16px',
+          marginBottom: '40px',
         }}>
-          <p style={{ color: '#6b7280', fontSize: '13px', textTransform: 'uppercase', letterSpacing: '2px', margin: '0 0 8px' }}>
-            Welcome back
-          </p>
-          <h1 style={{ color: '#ffffff', fontSize: '26px', fontWeight: '800', margin: '0 0 20px', letterSpacing: '-0.3px' }}>
-            +91 {user.phone}
-          </h1>
+          {stats.map(s => (
+            <StatCard key={s.label} {...s} />
+          ))}
+        </div>
 
-          {/* Role badge */}
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{
-              background: isAdmin ? 'rgba(124,58,237,0.2)' : 'rgba(37,99,235,0.2)',
-              border: `1px solid ${isAdmin ? 'rgba(124,58,237,0.5)' : 'rgba(37,99,235,0.5)'}`,
-              color: isAdmin ? '#a78bfa' : '#60a5fa',
-              fontSize: '12px',
-              fontWeight: '600',
-              textTransform: 'uppercase',
-              letterSpacing: '1.5px',
-              padding: '4px 12px',
-              borderRadius: '999px',
-            }}>
-              {user.role}
-            </span>
+        {/* Quick actions */}
+        <div style={{
+          background: '#0f1120', border: '1px solid #1e2236',
+          borderRadius: '20px', padding: '28px 32px',
+          display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center',
+          justifyContent: 'space-between',
+        }}>
+          <div>
+            <p style={{ color: '#ffffff', fontSize: '15px', fontWeight: '700', margin: '0 0 4px' }}>Ready to order?</p>
+            <p style={{ color: '#4b5563', fontSize: '13px', margin: 0 }}>Browse products or check your order history.</p>
+          </div>
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+            <button
+              onClick={() => navigate('/products')}
+              style={{
+                background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+                border: 'none', borderRadius: '10px', color: '#fff',
+                fontSize: '13px', fontWeight: '700', padding: '10px 20px',
+                cursor: 'pointer', letterSpacing: '0.5px',
+              }}
+            >
+              Browse Products
+            </button>
+            <button
+              onClick={() => navigate('/orders')}
+              style={{
+                background: 'transparent', border: '1px solid #1e2236',
+                borderRadius: '10px', color: '#9ca3af',
+                fontSize: '13px', fontWeight: '600', padding: '10px 20px',
+                cursor: 'pointer',
+              }}
+            >
+              View Orders
+            </button>
           </div>
         </div>
 
-        {/* Logout button */}
-        <button
-          onClick={handleLogout}
-          style={{
-            width: '100%',
-            padding: '15px',
-            background: 'transparent',
-            border: '1px solid #1e2236',
-            borderRadius: '14px',
-            color: '#9ca3af',
-            fontSize: '14px',
-            fontWeight: '600',
-            letterSpacing: '1px',
-            cursor: 'pointer',
-            transition: 'border-color 0.2s, color 0.2s',
-          }}
-          onMouseEnter={e => { e.target.style.borderColor = '#374151'; e.target.style.color = '#ffffff' }}
-          onMouseLeave={e => { e.target.style.borderColor = '#1e2236'; e.target.style.color = '#9ca3af' }}
-        >
-          Logout
-        </button>
-
-      </div>
+      </main>
     </div>
   )
 }
