@@ -11,3 +11,23 @@ body {
 .phone-input::placeholder {
   color: #374151;
 }
+
+/* Add to Cart button — idle state */
+.btn-cart {
+  transform: scale(1);
+  transition: background 0.3s, transform 0.1s;
+}
+.btn-cart:active {
+  transform: scale(0.96);
+}
+
+/* Add to Cart button — added state with bounce */
+.btn-added {
+  animation: btn-bounce 0.35s ease;
+}
+@keyframes btn-bounce {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(0.93); }
+  60%  { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
