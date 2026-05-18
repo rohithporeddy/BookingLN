@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase'
 import Navbar from '../components/Navbar'
 import StatusBadge from '../components/StatusBadge'
 import OrderDetailModal from '../components/OrderDetailModal'
+import config from '../config'
 
 const FILTER_STATUSES = ['all', 'placed', 'confirmed', 'delivered', 'cancelled']
 const UPDATE_STATUSES = ['placed', 'confirmed', 'delivered', 'cancelled']
@@ -27,13 +28,8 @@ export default function Orders() {
   const [dateFrom, setDateFrom]         = useState('')
   const [dateTo, setDateTo]             = useState('')
 
-  const user = JSON.parse(localStorage.getItem('user') || 'null')
+  const user = JSON.parse(localStorage.getItem('user') || '{}')
   const isAdmin = user?.role === 'admin'
-
-  if (!user) {
-    navigate('/login', { replace: true })
-    return null
-  }
 
   useEffect(() => { fetchOrders() }, [])
 
@@ -220,7 +216,7 @@ export default function Orders() {
                   )}
                   <td style={{ padding: '14px 16px', whiteSpace: 'nowrap' }}>
                     <span style={{ color: '#a78bfa', fontSize: '14px', fontWeight: '800' }}>
-                      ₹{parseFloat(order.total_amount).toFixed(2)}
+                      {config.currency}{parseFloat(order.total_amount).toFixed(2)}
                     </span>
                   </td>
 

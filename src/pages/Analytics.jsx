@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import Navbar from '../components/Navbar'
+import config from '../config'
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 
@@ -100,18 +100,13 @@ const inputStyle = {
 }
 
 export default function Analytics() {
-  const navigate = useNavigate()
   const [orders, setOrders]   = useState([])
   const [loading, setLoading] = useState(true)
   const [preset, setPreset]   = useState(30)
   const [dateFrom, setDateFrom] = useState('')
   const [dateTo, setDateTo]     = useState('')
 
-  const user = JSON.parse(localStorage.getItem('user') || 'null')
-  if (!user || user.role !== 'admin') {
-    navigate('/home', { replace: true })
-    return null
-  }
+  const user = JSON.parse(localStorage.getItem('user') || '{}')
 
   useEffect(() => { fetchData() }, [preset, dateFrom, dateTo])
 
@@ -161,7 +156,7 @@ export default function Analytics() {
   const revenueRows = stats.byDay.map(d => ({
     label:   fmtDate(d.day),
     value:   d.revenue,
-    display: `₹${d.revenue.toFixed(0)}`,
+    display: `${config.currency}${d.revenue.toFixed(0)}`,
     color:   'linear-gradient(180deg,#3b82f6,#1d4ed8)',
   }))
 
@@ -209,10 +204,10 @@ export default function Analytics() {
 
         {/* KPI cards */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(200px,1fr))', gap: '16px', marginBottom: '32px' }}>
-          <KPICard label="Total Revenue"   value={loading ? '…' : `₹${stats.revenue.toFixed(0)}`}     sub="Gross sales"           accent="#a78bfa" />
-          <KPICard label="Orders"          value={loading ? '…' : stats.count}                         sub="In selected period"    accent="#60a5fa" />
-          <KPICard label="Avg Order Value" value={loading ? '…' : `₹${stats.avgValue.toFixed(0)}`}    sub="Per order"             accent="#f59e0b" />
-          <KPICard label="Total Litres"    value={loading ? '…' : `${stats.totalLitres.toFixed(1)}L`} sub="Across all products"   accent="#4ade80" />
+          <KPICard label="Total Revenue"                       value={loading ? '…' : `${config.currency}${stats.revenue.toFixed(0)}`}              sub="Gross sales"           accent="#a78bfa" />
+          <KPICard label="Orders"                              value={loading ? '…' : stats.count}                                                    sub="In selected period"    accent="#60a5fa" />
+          <KPICard label="Avg Order Value"                     value={loading ? '…' : `${config.currency}${stats.avgValue.toFixed(0)}`}               sub="Per order"             accent="#f59e0b" />
+          <KPICard label={`Total ${config.unit.label}`}        value={loading ? '…' : `${stats.totalLitres.toFixed(1)}${config.unit.abbr}`}           sub="Across all products"   accent="#4ade80" />
         </div>
 
         {/* Charts row */}
@@ -221,7 +216,7 @@ export default function Analytics() {
           {/* Revenue over time */}
           <div style={{ background: '#0f1120', border: '1px solid #1e2236', borderRadius: '18px', padding: '24px' }}>
             <p style={{ color: '#ffffff', fontSize: '15px', fontWeight: '700', margin: '0 0 4px' }}>Revenue Over Time</p>
-            <p style={{ color: '#4b5563', fontSize: '12px', margin: '0 0 20px' }}>Daily revenue in ₹</p>
+            <p style={{ color: '#4b5563', fontSize: '12px', margin: '0 0 20px' }}>Daily revenue in {config.currency}</p>
             {loading
               ? <div style={{ height: '160px', background: '#12141e', borderRadius: '10px', animation: 'pulse 1.5s infinite' }} />
               : <BarChart rows={revenueRows} height={160} />
@@ -248,8 +243,8 @@ export default function Analytics() {
 
         {/* Top products */}
         <div style={{ background: '#0f1120', border: '1px solid #1e2236', borderRadius: '18px', padding: '24px' }}>
-          <p style={{ color: '#ffffff', fontSize: '15px', fontWeight: '700', margin: '0 0 4px' }}>Top Products by Litres</p>
-          <p style={{ color: '#4b5563', fontSize: '12px', margin: '0 0 20px' }}>Total litres ordered per product</p>
+          <p style={{ color: '#ffffff', fontSize: '15px', fontWeight: '700', margin: '0 0 4px' }}>Top Products by {config.unit.label}</p>
+          <p style={{ color: '#4b5563', fontSize: '12px', margin: '0 0 20px' }}>Total {config.unit.label.toLowerCase()} ordered per product</p>
 
           {loading
             ? <div style={{ height: '120px', background: '#12141e', borderRadius: '10px', animation: 'pulse 1.5s infinite' }} />
@@ -259,7 +254,7 @@ export default function Analytics() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   {stats.topProducts.map(p => (
                     <HBar key={p.name} label={p.name} value={p.litres} max={maxLitres}
-                      color="linear-gradient(90deg,#3b82f6,#8b5cf6)" display={`${p.litres.toFixed(1)}L`} />
+                      color="linear-gradient(90deg,#3b82f6,#8b5cf6)" display={`${p.litres.toFixed(1)}${config.unit.abbr}`} />
                   ))}
                 </div>
               )

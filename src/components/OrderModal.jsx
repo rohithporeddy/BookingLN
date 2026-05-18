@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useCart } from '../context/CartContext'
+import config from '../config'
 
 const FIELDS = [
   { name: 'purchaser_name',  label: 'Purchaser Name',      placeholder: 'Full name of the person ordering', required: true  },
@@ -143,7 +144,7 @@ export default function OrderModal({ total, onClose, onSuccess }) {
               Delivery Details
             </h2>
             <p style={{ color: '#4b5563', fontSize: '13px', margin: 0 }}>
-              Order total: <span style={{ color: '#60a5fa', fontWeight: '700' }}>₹{total.toFixed(2)}</span>
+              Order total: <span style={{ color: '#60a5fa', fontWeight: '700' }}>{config.currency}{total.toFixed(2)}</span>
             </p>
           </div>
           <button

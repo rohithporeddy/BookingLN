@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useCart } from '../context/CartContext'
+import config from '../config'
 
 export default function ProductCard({ product }) {
   const [litres, setLitres] = useState(1)
@@ -46,15 +47,15 @@ export default function ProductCard({ product }) {
       {/* Price */}
       <div style={{ display: 'inline-flex', alignItems: 'baseline', gap: '4px' }}>
         <span style={{ color: '#60a5fa', fontSize: '22px', fontWeight: '800' }}>
-          ₹{product.price_per_litre}
+          {config.currency}{product.price_per_litre}
         </span>
-        <span style={{ color: '#4b5563', fontSize: '13px' }}>/litre</span>
+        <span style={{ color: '#4b5563', fontSize: '13px' }}>{config.unit.priceLabel}</span>
       </div>
 
       {/* Litres input */}
       <div>
         <label style={{ display: 'block', color: '#9ca3af', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>
-          Litres
+          {config.unit.label}
         </label>
         <input
           type="number"
@@ -80,7 +81,7 @@ export default function ProductCard({ product }) {
       {/* Total preview */}
       <p style={{ color: '#4b5563', fontSize: '13px', margin: 0 }}>
         Total:{' '}
-        <span style={{ color: '#a78bfa', fontWeight: '700' }}>₹{subtotal}</span>
+        <span style={{ color: '#a78bfa', fontWeight: '700' }}>{config.currency}{subtotal}</span>
       </p>
 
       {/* Add to Cart button with animation */}

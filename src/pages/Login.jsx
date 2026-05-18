@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import TestTubes from '../components/TestTubes'
+import config from '../config'
 
 export default function Login() {
   const [phone, setPhone] = useState('')
@@ -24,10 +25,12 @@ export default function Login() {
 
     const user = {
       phone,
-      role: phone === '9999999999' ? 'admin' : 'user',
+      role: config.adminPhones.includes(phone) ? 'admin' : 'user',
     }
     localStorage.setItem('user', JSON.stringify(user))
-    navigate('/home')
+    const redirect = sessionStorage.getItem('login_redirect')
+    sessionStorage.removeItem('login_redirect')
+    navigate(redirect || '/home')
   }
 
   return (
@@ -50,7 +53,7 @@ export default function Login() {
             Login to<br />Your Account
           </h1>
           <p style={{ color: '#6b7280', fontSize: '14px', margin: 0 }}>
-            Enter your phone number to continue
+            {config.tagline}
           </p>
         </div>
 
@@ -121,7 +124,7 @@ export default function Login() {
 
         {/* Brand */}
         <p style={{ textAlign: 'center', color: '#374151', fontSize: '13px', margin: 0 }}>
-          BookingLN
+          {config.name}
         </p>
 
       </div>

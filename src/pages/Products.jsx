@@ -10,13 +10,6 @@ export default function Products() {
   const [error, setError] = useState(null)
   const navigate = useNavigate()
 
-  // Protect route — redirect to login if no user in localStorage
-  const user = JSON.parse(localStorage.getItem('user') || 'null')
-  if (!user) {
-    navigate('/login', { replace: true })
-    return null
-  }
-
   useEffect(() => {
     fetchProducts()
   }, [])

@@ -4,7 +4,19 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>bookingln</title>
+    <!-- Title is injected from app.config.js > name by vite.config.js at build time -->
+    <title>%APP_NAME%</title>
+    <script>
+      // Restore the path saved by 404.html before React Router initialises.
+      (function () {
+        var redirect = sessionStorage.getItem('ghpages_redirect');
+        if (redirect) {
+          sessionStorage.removeItem('ghpages_redirect');
+          // Replace current history entry so the browser back button works correctly.
+          window.history.replaceState(null, '', '/BookingLN' + redirect);
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

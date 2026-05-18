@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import Navbar from '../components/Navbar'
+import config from '../config'
 
 function StatCard({ label, value, sub, accent }) {
   return (
@@ -26,11 +27,7 @@ export default function Home() {
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
 
-  const user = JSON.parse(localStorage.getItem('user') || 'null')
-  if (!user) {
-    navigate('/login', { replace: true })
-    return null
-  }
+  const user = JSON.parse(localStorage.getItem('user') || '{}')
 
   useEffect(() => { fetchOrders() }, [])
 
@@ -53,7 +50,7 @@ export default function Home() {
     { label: 'Total Orders',       value: loading ? '…' : total,                          sub: 'All time',              accent: '#ffffff'  },
     { label: 'Pending',            value: loading ? '…' : pending,                        sub: 'Placed or confirmed',   accent: '#60a5fa'  },
     { label: 'Delivered',          value: loading ? '…' : delivered,                      sub: 'Successfully delivered', accent: '#4ade80' },
-    { label: 'Total Spent',        value: loading ? '…' : `₹${totalSpent.toFixed(0)}`,   sub: 'Across all orders',     accent: '#a78bfa'  },
+    { label: 'Total Spent',        value: loading ? '…' : `${config.currency}${totalSpent.toFixed(0)}`,   sub: 'Across all orders',     accent: '#a78bfa'  },
   ]
 
   return (

@@ -28,11 +28,7 @@ const labelStyle = {
 export default function Profile() {
   const navigate = useNavigate()
 
-  const user = JSON.parse(localStorage.getItem('user') || 'null')
-  if (!user) {
-    navigate('/login', { replace: true })
-    return null
-  }
+  const user = JSON.parse(localStorage.getItem('user') || '{}')
 
   const [name, setName]       = useState(user.name || '')
   const [orgName, setOrgName] = useState(user.org_name || '')

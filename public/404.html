@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>BookingLN</title>
+    <script>
+      // GitHub Pages SPA redirect trick:
+      // Store the full path in sessionStorage, then redirect to index.html.
+      // index.html picks it up and restores the route via history.replaceState.
+      //
+      // CONFIGURE: update BASE_PATH to match basePath in app.config.js
+      var path = window.location.pathname;
+      var base = '/BookingLN'; // <-- change this when deploying a new instance
+      // Strip the base so we only store the app-relative path
+      var appPath = path.startsWith(base) ? path.slice(base.length) || '/' : path;
+      sessionStorage.setItem('ghpages_redirect', appPath + window.location.search + window.location.hash);
+      window.location.replace(base + '/');
+    </script>
+  </head>
+  <body></body>
+</html>
