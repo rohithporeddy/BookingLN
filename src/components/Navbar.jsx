@@ -1,5 +1,6 @@
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
+import config from '../config'
 
 const USER_TABS  = [
   { label: 'Home',     path: '/home'     },
@@ -51,7 +52,7 @@ export default function Navbar() {
         onClick={() => navigate('/home')}
         style={{ color: '#ffffff', fontWeight: '800', fontSize: '18px', letterSpacing: '-0.3px', cursor: 'pointer' }}
       >
-        BookingLN
+        {config.name}
       </span>
 
       {/* Navigation tabs */}

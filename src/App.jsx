@@ -6,18 +6,21 @@ import Cart from './pages/Cart'
 import Orders from './pages/Orders'
 import Analytics from './pages/Analytics'
 import Profile from './pages/Profile'
+import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="/login" element={<Login />} />
-      <Route path="/home" element={<Home />} />
-      <Route path="/products" element={<Products />} />
-      <Route path="/cart" element={<Cart />} />
-      <Route path="/orders"    element={<Orders />}    />
-      <Route path="/analytics" element={<Analytics />} />
-      <Route path="/profile"   element={<Profile />}   />
+
+      <Route path="/home"     element={<ProtectedRoute><Home /></ProtectedRoute>} />
+      <Route path="/products" element={<ProtectedRoute><Products /></ProtectedRoute>} />
+      <Route path="/cart"     element={<ProtectedRoute><Cart /></ProtectedRoute>} />
+      <Route path="/orders"   element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+      <Route path="/profile"  element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+      <Route path="/analytics" element={<ProtectedRoute adminOnly><Analytics /></ProtectedRoute>} />
+
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   )

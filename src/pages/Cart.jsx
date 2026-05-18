@@ -3,19 +3,13 @@ import { useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import Navbar from '../components/Navbar'
 import OrderModal from '../components/OrderModal'
+import config from '../config'
 
 export default function Cart() {
   const navigate = useNavigate()
   const { cartItems, removeFromCart, clearCart } = useCart()
   const [showModal, setShowModal] = useState(false)
   const [placedOrder, setPlacedOrder] = useState(null)
-
-  // Protect route
-  const user = JSON.parse(localStorage.getItem('user') || 'null')
-  if (!user) {
-    navigate('/login', { replace: true })
-    return null
-  }
 
   const total = cartItems.reduce(
     (sum, item) => sum + item.product.price_per_litre * item.litres,
@@ -114,11 +108,11 @@ export default function Cart() {
                       {product.name}
                     </p>
                     <p style={{ color: '#6b7280', fontSize: '13px', margin: 0 }}>
-                      ₹{product.price_per_litre}/L × {litres}L
+                      {config.currency}{product.price_per_litre}/{config.unit.abbr} × {litres}{config.unit.abbr}
                     </p>
                   </div>
                   <span style={{ color: '#a78bfa', fontSize: '16px', fontWeight: '800', flexShrink: 0 }}>
-                    ₹{(product.price_per_litre * litres).toFixed(2)}
+                    {config.currency}{(product.price_per_litre * litres).toFixed(2)}
                   </span>
                   <button
                     onClick={() => removeFromCart(product.id)}
@@ -143,7 +137,7 @@ export default function Cart() {
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                 <span style={{ color: '#6b7280', fontSize: '14px' }}>Subtotal</span>
-                <span style={{ color: '#ffffff', fontSize: '14px' }}>₹{total.toFixed(2)}</span>
+                <span style={{ color: '#ffffff', fontSize: '14px' }}>{config.currency}{total.toFixed(2)}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                 <span style={{ color: '#6b7280', fontSize: '14px' }}>Delivery</span>
@@ -152,7 +146,7 @@ export default function Cart() {
               <div style={{ width: '100%', height: '1px', background: '#1e2236', margin: '12px 0' }} />
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ color: '#ffffff', fontSize: '16px', fontWeight: '700' }}>Total</span>
-                <span style={{ color: '#60a5fa', fontSize: '22px', fontWeight: '900' }}>₹{total.toFixed(2)}</span>
+                <span style={{ color: '#60a5fa', fontSize: '22px', fontWeight: '900' }}>{config.currency}{total.toFixed(2)}</span>
               </div>
             </div>
 
